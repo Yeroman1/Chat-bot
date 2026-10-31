@@ -14,6 +14,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 // In-memory conversation memory keyed by sessionId
 const conversationHistory = {};
 
+// Helper function to check if the message asks "Who created you?"
+function isCreatorQuestion(messageText) {
+  if (!messageText) return false;
+  // Normalize by converting to lowercase, trimming whitespace, and stripping common punctuation
+  const cleanMessage = messageText
+    .toLowerCase()
+    .trim()
+    .replace(/[?.!,;:]/g, '');
+  return cleanMessage === 'who created you';
+}
+
 // Serve frontend SPA fallback
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
