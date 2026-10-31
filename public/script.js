@@ -418,3 +418,90 @@ function cleanTextForSpeech(text) {
     .replace(/```[\s\S]*?```/g, '[Code block]')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+}
+
+function speakMessageText(text, bubbleSpeakBtn = null) {
+  if (typeof speechSynthesis === 'undefined') return;
+
+  stopSpeaking();
+
+  const cleanedText = cleanTextForSpeech(text);
+  if (!cleanedText) return;
+
+  currentUtterance = new SpeechSynthesisUtterance(cleanedText);
+  currentUtterance.rate = playbackSpeed;
+
+  if (selectedVoiceName) {
+    const voiceObj = voices.find(v => v.name === selectedVoiceName);
+    if (voiceObj) {
+      currentUtterance.voice = voiceObj;
+    }
+  }
+
+  currentUtterance.onstart = () => {
+    voiceToggleBtn.classList.add('speaking');
+    voiceVisualizer.classList.remove('hidden');
+    
+    if (bubbleSpeakBtn) {
+      speakingElement = bubbleSpeakBtn;
+      speakingElement.classList.add('active-speaking');
+      speakingElement.title = "Stop speaking";
+    }
+  };
+
+  const handleEnd = () => {
+    voiceToggleBtn.classList.remove('speaking');
+    voiceVisualizer.classList.add('hidden');
+    if (speakingElement) {
+      speakingElement.classList.remove('active-speaking');
+      speakingElement.title = "Speak response";
+      speakingElement = null;
+    }
+    currentUtterance = null;
+  };
+
+  currentUtterance.onend = handleEnd;
+  currentUtterance.onerror = handleEnd;
+
+  speechSynthesis.speak(currentUtterance);
+}
+
+function stopSpeaking() {
+  if (typeof speechSynthesis === 'undefined') return;
+  speechSynthesis.cancel();
+  
+  voiceToggleBtn.classList.remove('speaking');
+  voiceVisualizer.classList.add('hidden');
+  if (speakingElement) {
+    speakingElement.classList.remove('active-speaking');
+    speakingElement.title = "Speak response";
+    speakingElement = null;
+  }
+  currentUtterance = null;
+}
+
+messagesContainer.addEventListener('click', (e) => {
+  const speakBtn = e.target.closest('.btn-speak-msg');
+  if (speakBtn) {
+    if (speakBtn.classList.contains('active-speaking')) {
+      stopSpeaking();
+    } else {
+      const bubble = speakBtn.closest('.message-bubble');
+      const contentDiv = bubble.querySelector('.message-content');
+      speakMessageText(contentDiv.textContent, speakBtn);
+    }
+  }
+});
+
+// Initial Scroll focus
+window.addEventListener('load', () => {
+  scrollToBottom();
+  messageInput.focus();
+});
