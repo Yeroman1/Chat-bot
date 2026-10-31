@@ -50,3 +50,59 @@ body {
   position: relative;
 }
 
+/* ==========================================================================
+   Background Ambient Glowing Orbs
+   ========================================================================== */
+.bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(130px);
+  z-index: 0;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.bg-glow-1 {
+  width: 45vw;
+  height: 45vw;
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, var(--primary-glow) 0%, rgba(125, 95, 255, 0) 70%);
+  animation: floatGlow1 25s ease-in-out infinite alternate;
+}
+
+.bg-glow-2 {
+  width: 40vw;
+  height: 40vw;
+  bottom: -10%;
+  right: -5%;
+  background: radial-gradient(circle, var(--secondary-glow) 0%, rgba(0, 242, 254, 0) 70%);
+  animation: floatGlow2 20s ease-in-out infinite alternate;
+}
+
+.bg-glow-3 {
+  width: 35vw;
+  height: 35vw;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--accent-magenta) 0%, rgba(224, 86, 253, 0) 70%);
+  animation: floatGlow3 30s ease-in-out infinite alternate;
+}
+
+@keyframes floatGlow1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8%, 10%) scale(1.15); }
+}
+
+@keyframes floatGlow2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10%, -8%) scale(1.2); }
+}
+
+@keyframes floatGlow3 {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.3; }
+  50% { opacity: 0.5; }
+  100% { transform: translate(-45%, -45%) scale(1.1); opacity: 0.3; }
+}
+
