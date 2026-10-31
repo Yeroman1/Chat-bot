@@ -46,3 +46,20 @@ function formatMessageText(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 
+  // Render code blocks: ```lang code ```
+  escaped = escaped.replace(/```([\s\S]*?)```/g, (match, code) => {
+    return `<pre class="code-block"><code>${code.trim()}</code></pre>`;
+  });
+
+  // Render inline code: `code`
+  escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Render bold text: **bold text**
+  escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Render new lines to line breaks
+  escaped = escaped.replace(/\n/g, '<br>');
+
+  return escaped;
+}
+
