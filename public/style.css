@@ -601,3 +601,69 @@ body {
   transform: none !important;
 }
 
+/* Voice Input Microphone Button Styles */
+.buttons-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-mic {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-mic svg {
+  width: 15px;
+  height: 15px;
+  transition: var(--transition-smooth);
+}
+
+.btn-mic:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+  transform: scale(1.08);
+}
+
+.btn-mic:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.btn-mic:disabled {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-mic.recording {
+  background: rgba(255, 76, 76, 0.18);
+  border-color: #ff4c4c;
+  color: #ff4c4c;
+  box-shadow: 0 0 15px rgba(255, 76, 76, 0.4);
+  animation: micPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes micPulse {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 76, 76, 0.3);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 22px rgba(255, 76, 76, 0.7);
+    transform: scale(1.08);
+  }
+}
+
