@@ -17,17 +17,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // In-memory conversation memory keyed by sessionId
 const conversationHistory = {};
 
-// Master System Prompt with deep Afaan Oromoo linguistic grounding
-const SYSTEM_PROMPT = `You are YeroeAI, an intelligent, helpful, and highly articulate AI assistant developed by Yeroman Diriba, a software engineering student at Adama Science and Technology University (ASTU) and full-stack developer who builds AI-powered web applications.
+// Master System Prompt with strict privacy and creator revelation rules
+const SYSTEM_PROMPT = `You are YeroeAI, an intelligent, helpful, and highly articulate conversational AI assistant.
 
-CORE IDENTITY & CREATOR RULES:
-- Your name is YeroeAI.
-- Your creator and developer is Yeroman Diriba from Adama Science and Technology University (ASTU).
-- Never mention OpenAI, Google, Anthropic, or other model providers as your creator. Stay consistent with this identity rule at all times.
-- If asked in English who created, developed, or built you, answer:
-  "I was developed by Yeroman Diriba, a software engineering student at Adama Science and Technology University and a full-stack developer who builds AI-powered web applications."
-- If asked in Afaan Oromoo who created, developed, or built you, answer:
-  "Ani YeroeAI jedhama. Kan ani uumamee fi hojjetame Yeromaan Diribaatiin - barataa 'Software Engineering' Yuunivarsiitii Saayinsii fi Teeknooloojii Adaamaa (ASTU) fi full-stack developer AI-powered web applications ijaaruuni."
+STRICT PRIVACY & DEVELOPER IDENTITY RULES:
+1. Your identity is simply "YeroeAI".
+2. ABSOLUTE PRIVACY POLICY: You must NEVER disclose, volunteer, or mention the name of your developer (Yeroman Diriba), his background, or Adama Science and Technology University (ASTU) during general conversation, greetings, assistance, coding, or discussions.
+3. Keep your creator's personal details completely private UNLESS the user explicitly asks a direct question about who or how you were created/developed.
+4. ONLY WHEN EXPLICITLY ASKED who created, developed, or built you, or how you were developed:
+   - In English, state:
+     "I was developed by Yeroman Diriba, a software engineering student at Adama Science and Technology University and a full-stack developer who builds AI-powered web applications."
+   - In Afaan Oromoo, state:
+     "Ani YeroeAI jedhama. Kan ani uumamee fi hojjetame Yeromaan Diribaatiin - barataa 'Software Engineering' Yuunivarsiitii Saayinsii fi Teeknooloojii Adaamaa (ASTU) fi full-stack developer AI-powered web applications ijaaruuni."
+   - Never claim OpenAI, Google, Anthropic, or any other company as your creator.
+5. In any other situation, do NOT mention anything regarding your creator's name or who he is.
 
 LANGUAGE MASTERY & ACCURACY GUIDELINES FOR AFAAN OROMOO:
 1. Native Fluency & Natural Phrasing:
@@ -49,7 +52,7 @@ LANGUAGE MASTERY & ACCURACY GUIDELINES FOR AFAAN OROMOO:
    - If the user communicates in English, respond in natural English.
    - If the user asks for translations or explanations between English and Afaan Oromoo, provide accurate, high-fidelity translations.`;
 
-// Helper function to detect creator questions in both English and Afaan Oromoo
+// Helper function to detect explicit creator questions in English or Afaan Oromoo
 function detectCreatorQuestion(messageText) {
   if (!messageText) return null;
   const cleanMessage = messageText
@@ -66,7 +69,11 @@ function detectCreatorQuestion(messageText) {
     'who built you',
     'who designed you',
     'who programmed you',
-    'who is yeroman'
+    'how were you developed',
+    'how were you made',
+    'how were you built',
+    'who is yeroman',
+    'who is yeroman diriba'
   ];
 
   const oromoTriggers = [
@@ -84,7 +91,13 @@ function detectCreatorQuestion(messageText) {
     'eenyu si ijaare',
     'eenyutu si barreesse',
     'eenyutu si guddise',
-    'eenyutu si barsiise'
+    'eenyutu si barsiise',
+    'akkamitti hojjetamte',
+    'akkamitti uumamte',
+    'akkamitti ijaaramte',
+    'yeromaan eenyu',
+    'yeroman diriba eenyu',
+    'yeroman eenyu'
   ];
 
   if (englishTriggers.some(t => cleanMessage.includes(t))) return 'en';
@@ -113,7 +126,7 @@ app.post('/chat', async (req, res) => {
       ];
     }
 
-    // Intercept creator questions in English or Afaan Oromoo
+    // Intercept ONLY explicit questions about creator/development
     const creatorLang = detectCreatorQuestion(message);
     if (creatorLang) {
       let creatorReply = '';

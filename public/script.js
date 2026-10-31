@@ -60,7 +60,7 @@ const UI_TRANSLATIONS = {
     langName: 'English',
     langBadge: 'EN',
     headerStatus: 'Ask anything',
-    welcomeGreeting: `Greetings. I am <strong>YeroeAI</strong>, an intelligent assistant developed by Yeroman Diriba. How can I assist you with your project, design, or ideas today?`,
+    welcomeGreeting: `Greetings. I am <strong>YeroeAI</strong>, your intelligent conversational assistant. How can I assist you with your project, design, or ideas today?`,
     inputPlaceholder: 'Ask me anything...',
     listeningPlaceholder: 'Listening...',
     newChat: 'New Chat',
