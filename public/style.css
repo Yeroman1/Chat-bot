@@ -667,3 +667,225 @@ body {
   }
 }
 
+/* Voice Mode Container & UI Components */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voice-control-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-voice-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+  user-select: none;
+}
+
+.btn-voice-toggle svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.btn-voice-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+.btn-voice-toggle:hover svg {
+  color: var(--text-primary);
+}
+
+/* Active Voice Mode State */
+.btn-voice-toggle.voice-on {
+  background: rgba(0, 242, 254, 0.08);
+  border-color: rgba(0, 242, 254, 0.3);
+  color: var(--secondary-glow);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.1);
+}
+
+.btn-voice-toggle.voice-on svg {
+  color: var(--secondary-glow);
+  filter: drop-shadow(0 0 2px var(--secondary-glow));
+}
+
+.btn-voice-toggle.speaking {
+  animation: voiceGlowPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes voiceGlowPulse {
+  0% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.1); }
+  100% { box-shadow: 0 0 16px rgba(0, 242, 254, 0.35); }
+}
+
+/* Voice Settings Cog Button */
+.btn-voice-settings {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition-smooth);
+}
+
+.btn-voice-settings svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.5s ease;
+}
+
+.btn-voice-settings:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+.btn-voice-settings:hover svg {
+  transform: rotate(45deg);
+}
+
+/* Voice Settings Dropdown (Glassmorphism) */
+.voice-settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 250px;
+  background: rgba(10, 12, 32, 0.95);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideDownFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header h3 {
+  font-family: var(--font-family-title);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.dropdown-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.setting-field label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.setting-field .label-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-field .label-wrapper span {
+  font-size: 0.72rem;
+  color: var(--secondary-glow);
+  font-weight: 600;
+}
+
+.voice-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-family-body);
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: var(--transition-smooth);
+}
+
+.voice-select:focus {
+  border-color: var(--border-focus);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.voice-select option {
+  background-color: #0b0d21;
+  color: var(--text-primary);
+}
+
+.voice-speed-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.voice-speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--secondary-glow);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--secondary-glow);
+  transition: transform 0.1s;
+}
+
+.voice-speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
