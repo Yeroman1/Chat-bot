@@ -197,3 +197,125 @@ chatForm.addEventListener('submit', async (e) => {
   }
 });
 
+// New Chat Reset Action
+newChatBtn.addEventListener('click', async () => {
+  // Stop recording/speaking if active
+  stopRecording();
+  stopSpeaking();
+
+  // Confirm with a subtle UI fade or simple confirmation. Since it's a smooth design, let's reset instantly.
+  try {
+    const response = await fetch('/chat/reset', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sessionId })
+    });
+
+    if (response.ok) {
+      // Animate card content transition optionally, or clear messages
+      const messages = messagesContainer.querySelectorAll('.message:not(.welcome-message)');
+      messages.forEach(msg => {
+        msg.style.animation = 'slideUpFade 0.2s reverse forwards';
+        setTimeout(() => msg.remove(), 200);
+      });
+
+      // Reset Session ID to start fresh
+      sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+      sessionStorage.setItem('yeroeai_chat_session_id', sessionId);
+      
+      // Focus on message input
+      setTimeout(() => {
+        messageInput.focus();
+      }, 300);
+    } else {
+      console.error('Server failed to reset conversation.');
+    }
+  } catch (error) {
+    console.error('Error during reset request:', error);
+  }
+});
+
+// Speech Recognition (Web Speech API) Setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+let isRecording = false;
+
+if (SpeechRecognition) {
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    isRecording = true;
+    micBtn.classList.add('recording');
+    micBtn.title = "Listening... Click to stop";
+    messageInput.placeholder = "Listening...";
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    if (transcript) {
+      const currentText = messageInput.value;
+      const spacing = currentText && !currentText.endsWith(' ') ? ' ' : '';
+      messageInput.value = currentText + spacing + transcript;
+      
+      // Trigger character count, auto-resize, and enable send button
+      messageInput.dispatchEvent(new Event('input'));
+    }
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+    if (event.error === 'not-allowed') {
+      alert("Microphone permission was denied. Please allow microphone access in your browser settings to use voice input.");
+    }
+    stopRecording();
+  };
+
+  recognition.onend = () => {
+    stopRecording();
+  };
+} else {
+  // Disable microphone button if browser doesn't support Web Speech API
+  micBtn.disabled = true;
+  micBtn.title = "Speech recognition is not supported in this browser.";
+}
+
+function startRecording() {
+  if (!recognition) return;
+  try {
+    recognition.start();
+  } catch (error) {
+    console.error('Failed to start speech recognition:', error);
+  }
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (micBtn) {
+    micBtn.classList.remove('recording');
+    micBtn.title = "Voice Input";
+  }
+  if (messageInput) {
+    messageInput.placeholder = "Ask me anything...";
+  }
+  if (recognition) {
+    try {
+      recognition.stop();
+    } catch (e) {
+      // Ignored if already stopped
+    }
+  }
+}
+
+micBtn.addEventListener('click', () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
