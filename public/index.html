@@ -145,7 +145,25 @@
 
         <!-- Dynamic messages will be appended here by script.js -->
 
+        <!-- Typing Indicator Container -->
+        <div class="message message-ai typing-indicator-container hidden" id="typingIndicator">
+          <div class="avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z" />
+              <path d="M12 8v8M8 12h8" />
+            </svg>
+          </div>
+          <div class="message-bubble typing-bubble">
+            <div class="typing-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </div>
+
       </section>
+
     </div>
   </main>
 </body>
