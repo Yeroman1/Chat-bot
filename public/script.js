@@ -143,3 +143,57 @@ messageInput.addEventListener('keydown', (e) => {
   }
 });
 
+// Form Submission Event
+chatForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const userMessageText = messageInput.value.trim();
+  if (!userMessageText) return;
+
+  // Stop recording/speaking if active
+  stopRecording();
+  stopSpeaking();
+
+  // Clear inputs and reset height
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+  charCounter.textContent = '0 / 1000';
+  sendBtn.disabled = true;
+
+  // Add User bubble
+  appendMessage('user', userMessageText);
+
+  // Show typing animation
+  showTypingIndicator();
+
+  try {
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: userMessageText,
+        sessionId: sessionId
+      })
+    });
+
+    const data = await response.json();
+
+    hideTypingIndicator();
+
+    if (response.ok && data.response) {
+      appendMessage('ai', data.response);
+      if (isVoiceModeOn) {
+        speakMessageText(data.response);
+      }
+    } else {
+      appendMessage('ai', data.error || 'Server error. Failed to process your message.', true);
+    }
+  } catch (err) {
+    console.error('Fetch error:', err);
+    hideTypingIndicator();
+    appendMessage('ai', 'Connection lost. Please check if your server is running and try again.', true);
+  }
+});
+
