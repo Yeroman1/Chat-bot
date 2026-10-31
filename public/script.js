@@ -319,3 +319,102 @@ micBtn.addEventListener('click', () => {
   }
 });
 
+// Voice Mode (Speech Synthesis) Setup
+let isVoiceModeOn = localStorage.getItem('yeroeai_voice_mode') === 'true';
+let selectedVoiceName = localStorage.getItem('yeroeai_selected_voice');
+let playbackSpeed = parseFloat(localStorage.getItem('yeroeai_playback_speed')) || 1.0;
+let currentUtterance = null;
+let speakingElement = null;
+
+function updateVoiceToggleUI() {
+  if (isVoiceModeOn) {
+    voiceToggleBtn.classList.add('voice-on');
+    document.querySelector('.voice-status-label').textContent = 'Voice ON';
+  } else {
+    voiceToggleBtn.classList.remove('voice-on');
+    document.querySelector('.voice-status-label').textContent = 'Voice OFF';
+    stopSpeaking();
+  }
+}
+updateVoiceToggleUI();
+
+let voices = [];
+function populateVoiceList() {
+  if (typeof speechSynthesis === 'undefined') return;
+  voices = speechSynthesis.getVoices();
+  
+  voiceSelect.innerHTML = '';
+  
+  const sortedVoices = [...voices].sort((a, b) => {
+    const aEn = a.lang.startsWith('en');
+    const bEn = b.lang.startsWith('en');
+    if (aEn && !bEn) return -1;
+    if (!aEn && bEn) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  sortedVoices.forEach(voice => {
+    const option = document.createElement('option');
+    option.textContent = `${voice.name} (${voice.lang})`;
+    option.value = voice.name;
+    if (voice.name === selectedVoiceName) {
+      option.selected = true;
+    }
+    voiceSelect.appendChild(option);
+  });
+
+  if (!selectedVoiceName && sortedVoices.length > 0) {
+    const defaultVoice = sortedVoices.find(v => v.lang.includes('US') || v.lang.includes('GB')) || sortedVoices[0];
+    if (defaultVoice) {
+      selectedVoiceName = defaultVoice.name;
+      localStorage.setItem('yeroeai_selected_voice', selectedVoiceName);
+      voiceSelect.value = selectedVoiceName;
+    }
+  }
+}
+
+populateVoiceList();
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+}
+
+voiceSpeed.value = playbackSpeed;
+speedVal.textContent = `${playbackSpeed.toFixed(1)}x`;
+
+voiceSpeed.addEventListener('input', (e) => {
+  playbackSpeed = parseFloat(e.target.value);
+  speedVal.textContent = `${playbackSpeed.toFixed(1)}x`;
+  localStorage.setItem('yeroeai_playback_speed', playbackSpeed);
+});
+
+voiceSelect.addEventListener('change', (e) => {
+  selectedVoiceName = e.target.value;
+  localStorage.setItem('yeroeai_selected_voice', selectedVoiceName);
+});
+
+voiceSettingsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  voiceSettingsDropdown.classList.toggle('hidden');
+});
+
+document.addEventListener('click', (e) => {
+  if (!voiceSettingsDropdown.classList.contains('hidden') && 
+      !voiceSettingsDropdown.contains(e.target) && 
+      e.target !== voiceSettingsBtn && 
+      !voiceSettingsBtn.contains(e.target)) {
+    voiceSettingsDropdown.classList.add('hidden');
+  }
+});
+
+voiceToggleBtn.addEventListener('click', () => {
+  isVoiceModeOn = !isVoiceModeOn;
+  localStorage.setItem('yeroeai_voice_mode', isVoiceModeOn);
+  updateVoiceToggleUI();
+});
+
+function cleanTextForSpeech(text) {
+  if (!text) return '';
+  return text
+    .replace(/```[\s\S]*?```/g, '[Code block]')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
