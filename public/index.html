@@ -90,8 +90,28 @@
               </svg>
             </button>
 
-            </button>
+            <!-- Voice Settings Dropdown -->
+            <div class="voice-settings-dropdown hidden" id="voiceSettingsDropdown">
+              <div class="dropdown-header">
+                <h3>Voice Settings</h3>
+              </div>
+              <div class="dropdown-body">
+                <div class="setting-field">
+                  <label for="voiceSelect">Select Accent/Voice</label>
+                  <select id="voiceSelect" class="voice-select"></select>
+                </div>
+                <div class="setting-field">
+                  <div class="label-wrapper">
+                    <label for="voiceSpeed">Playback Speed</label>
+                    <span id="speedVal">1.0x</span>
+                  </div>
+                  <input type="range" id="voiceSpeed" min="0.5" max="2.0" step="0.1" value="1.0"
+                    class="voice-speed-slider">
+                </div>
+              </div>
+            </div>
           </div>
+
         </div>
       </header>
     </div>
