@@ -1,0 +1,52 @@
+/* ==========================================================================
+   Design System & Variables
+   ========================================================================== */
+:root {
+  --bg-color-dark: #05060f;
+  --bg-card: rgba(10, 12, 30, 0.5);
+  --bg-input: rgba(255, 255, 255, 0.04);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(0, 242, 254, 0.5);
+  
+  /* Harmonious Modern Palettes */
+  --primary-glow: #7d5fff;
+  --secondary-glow: #00f2fe;
+  --accent-magenta: #e056fd;
+  
+  --text-primary: #f5f6fa;
+  --text-secondary: #a4b0be;
+  --text-dark: #1e272e;
+  
+  --gradient-neon: linear-gradient(135deg, var(--secondary-glow) 0%, var(--primary-glow) 100%);
+  --gradient-bubble-user: linear-gradient(135deg, #6c5ce7 0%, #4b36c4 100%);
+  --gradient-bubble-ai: rgba(255, 255, 255, 0.05);
+  
+  --font-family-body: 'Inter', sans-serif;
+  --font-family-title: 'Outfit', sans-serif;
+  
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --border-radius-lg: 24px;
+  --border-radius-md: 16px;
+  --border-radius-sm: 12px;
+}
+
+/* Reset and Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-body);
+  background-color: var(--bg-color-dark);
+  color: var(--text-primary);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
