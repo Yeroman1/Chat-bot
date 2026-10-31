@@ -26,3 +26,23 @@ if (!sessionId) {
 // Initial state
 sendBtn.disabled = true;
 
+// Helper: Scroll to bottom
+function scrollToBottom() {
+  messagesContainer.scrollTo({
+    top: messagesContainer.scrollHeight,
+    behavior: 'smooth'
+  });
+}
+
+// Helper: Format message text safely (simple Markdown parsing)
+function formatMessageText(text) {
+  if (!text) return '';
+
+  // Escape HTML entities to prevent XSS attacks
+  let escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
