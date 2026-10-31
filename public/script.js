@@ -63,3 +63,50 @@ function formatMessageText(text) {
   return escaped;
 }
 
+// Helper: Append Message Bubble to the Chat window
+function appendMessage(sender, text, isError = false) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message message-${sender} ${isError ? 'message-error' : ''}`;
+
+  const avatarSvg = sender === 'user' 
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+       </svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
+        <path d="M12 8v8M8 12h8"/>
+       </svg>`;
+
+  const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  let footerContent = `<span class="message-time">${timeString}</span>`;
+  if (sender === 'ai' && !isError) {
+    footerContent = `
+      <div class="bubble-footer">
+        <button class="btn-speak-msg" title="Speak response">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path class="speaker-wave-icon-path" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <span class="message-time">${timeString}</span>
+      </div>
+    `;
+  }
+
+  messageDiv.innerHTML = `
+    <div class="avatar">
+      ${avatarSvg}
+    </div>
+    <div class="message-bubble">
+      <div class="message-content">${formatMessageText(text)}</div>
+      ${sender === 'ai' && !isError ? footerContent : `<span class="message-time">${timeString}</span>`}
+    </div>
+  `;
+
+  // Insert before the typing indicator
+  messagesContainer.insertBefore(messageDiv, typingIndicator);
+  scrollToBottom();
+}
+
