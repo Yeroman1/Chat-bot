@@ -110,3 +110,36 @@ function appendMessage(sender, text, isError = false) {
   scrollToBottom();
 }
 
+// Show/Hide typing indicator
+function showTypingIndicator() {
+  typingIndicator.classList.remove('hidden');
+  scrollToBottom();
+}
+
+function hideTypingIndicator() {
+  typingIndicator.classList.add('hidden');
+}
+
+// Auto-resize input textarea and manage counts
+messageInput.addEventListener('input', () => {
+  // Auto grow/shrink
+  messageInput.style.height = 'auto';
+  const newHeight = Math.min(messageInput.scrollHeight, 120);
+  messageInput.style.height = `${newHeight}px`;
+
+  // Character counter
+  const len = messageInput.value.length;
+  charCounter.textContent = `${len} / 1000`;
+
+  // Send button disabled status
+  sendBtn.disabled = len === 0;
+});
+
+// Trigger submit on Enter, but preserve Shift+Enter newline
+messageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    chatForm.dispatchEvent(new Event('submit'));
+  }
+});
+
