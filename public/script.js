@@ -7,14 +7,82 @@ const messageInput = document.getElementById('messageInput');
 const charCounter = document.getElementById('charCounter');
 const sendBtn = document.getElementById('sendBtn');
 const newChatBtn = document.getElementById('newChatBtn');
+const newChatLabel = document.getElementById('newChatLabel');
 const micBtn = document.getElementById('micBtn');
 const voiceToggleBtn = document.getElementById('voiceToggleBtn');
+const voiceStatusLabel = document.getElementById('voiceStatusLabel');
 const voiceSettingsBtn = document.getElementById('voiceSettingsBtn');
 const voiceSettingsDropdown = document.getElementById('voiceSettingsDropdown');
+const voiceSettingsHeading = document.getElementById('voiceSettingsHeading');
 const voiceSelect = document.getElementById('voiceSelect');
+const voiceSelectLabel = document.getElementById('voiceSelectLabel');
 const voiceSpeed = document.getElementById('voiceSpeed');
+const voiceSpeedLabel = document.getElementById('voiceSpeedLabel');
 const speedVal = document.getElementById('speedVal');
 const voiceVisualizer = document.getElementById('voiceVisualizer');
+
+// Language Elements
+const langToggleBtn = document.getElementById('langToggleBtn');
+const langName = document.getElementById('langName');
+const langBadge = document.getElementById('langBadge');
+const headerStatusText = document.getElementById('headerStatusText');
+const welcomeGreeting = document.getElementById('welcomeGreeting');
+const suggestionsContainer = document.getElementById('suggestionsContainer');
+const suggestionsTitle = document.getElementById('suggestionsTitle');
+const suggestionsChips = document.getElementById('suggestionsChips');
+
+// Language Dictionaries
+const UI_TRANSLATIONS = {
+  om: {
+    langName: 'Afaan Oromoo',
+    langBadge: 'OM',
+    headerStatus: 'Waan feete gaafadhu',
+    welcomeGreeting: `Akkam jirtu! Ani <strong>YeroeAI</strong>, gargaaraa keessan isa sammuu-namtolcheeti. Har'a pirojektii, qunnamtii ykn yaada keessan maaliin isin gargaaruu danda'a?`,
+    inputPlaceholder: 'Waan barbaadde na gaafadhu...',
+    listeningPlaceholder: 'Dhaggeeffachaa jira...',
+    newChat: 'Haaraa Eegali',
+    voiceOn: 'Sagalee BANI',
+    voiceOff: 'Sagalee DHAAMI',
+    voiceSettingsHeading: "Qindaa'ina Sagalee",
+    voiceSelectLabel: 'Sagalee Filadhu / Accent',
+    voiceSpeedLabel: 'Saffisa Sagalee',
+    suggestionsTitle: 'Fakkeenyaaf Gaafadhu / Suggested Prompts:',
+    micTitle: 'Sagaleen Gaafadhu (Afaan Oromoo / English)',
+    sendTitle: 'Ergi / Send message',
+    suggestions: [
+      "Eenyutu si uume?",
+      "Sammuu-namtolcheen (AI) maali?",
+      "Akkamitti Python barachuu danda'a?",
+      "Waa'ee Yuunivarsiitii ASTU natti himi"
+    ]
+  },
+  en: {
+    langName: 'English',
+    langBadge: 'EN',
+    headerStatus: 'Ask anything',
+    welcomeGreeting: `Greetings. I am <strong>YeroeAI</strong>, an intelligent assistant developed by Yeroman Diriba. How can I assist you with your project, design, or ideas today?`,
+    inputPlaceholder: 'Ask me anything...',
+    listeningPlaceholder: 'Listening...',
+    newChat: 'New Chat',
+    voiceOn: 'Voice ON',
+    voiceOff: 'Voice OFF',
+    voiceSettingsHeading: 'Voice Settings',
+    voiceSelectLabel: 'Select Accent / Voice',
+    voiceSpeedLabel: 'Playback Speed',
+    suggestionsTitle: 'Quick Suggested Prompts:',
+    micTitle: 'Voice Input',
+    sendTitle: 'Send message',
+    suggestions: [
+      "Who created you?",
+      "What is Artificial Intelligence?",
+      "How do I start learning Python?",
+      "Tell me about ASTU University"
+    ]
+  }
+};
+
+// Initialize Active Language
+let currentLanguage = localStorage.getItem('yeroeai_lang') || 'om';
 
 // Initialize Session ID
 let sessionId = sessionStorage.getItem('yeroeai_chat_session_id');
@@ -63,8 +131,70 @@ function formatMessageText(text) {
   return escaped;
 }
 
+// Render dynamic suggestion chips
+function renderSuggestions() {
+  if (!suggestionsChips) return;
+  suggestionsChips.innerHTML = '';
+  const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.om;
+  
+  t.suggestions.forEach(promptText => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'suggestion-chip';
+    chip.innerHTML = `<span>💬</span> ${promptText}`;
+    chip.addEventListener('click', () => {
+      messageInput.value = promptText;
+      messageInput.dispatchEvent(new Event('input'));
+      messageInput.focus();
+      chatForm.dispatchEvent(new Event('submit'));
+    });
+    suggestionsChips.appendChild(chip);
+  });
+}
+
+// Switch UI language
+function applyLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem('yeroeai_lang', lang);
+  const t = UI_TRANSLATIONS[lang] || UI_TRANSLATIONS.om;
+
+  if (langName) langName.textContent = t.langName;
+  if (langBadge) langBadge.textContent = t.langBadge;
+  if (headerStatusText) headerStatusText.textContent = t.headerStatus;
+  if (welcomeGreeting) welcomeGreeting.innerHTML = t.welcomeGreeting;
+  if (messageInput) messageInput.placeholder = isRecording ? t.listeningPlaceholder : t.inputPlaceholder;
+  if (newChatLabel) newChatLabel.textContent = t.newChat;
+  if (voiceSettingsHeading) voiceSettingsHeading.textContent = t.voiceSettingsHeading;
+  if (voiceSelectLabel) voiceSelectLabel.textContent = t.voiceSelectLabel;
+  if (voiceSpeedLabel) voiceSpeedLabel.textContent = t.voiceSpeedLabel;
+  if (suggestionsTitle) suggestionsTitle.textContent = t.suggestionsTitle;
+  if (micBtn) micBtn.title = t.micTitle;
+  if (sendBtn) sendBtn.title = t.sendTitle;
+
+  updateVoiceToggleUI();
+  renderSuggestions();
+
+  // Update Web Speech recognition language
+  if (recognition) {
+    recognition.lang = (lang === 'om') ? 'om-ET' : 'en-US';
+  }
+}
+
+// Toggle language event listener
+if (langToggleBtn) {
+  langToggleBtn.addEventListener('click', () => {
+    const nextLang = currentLanguage === 'om' ? 'en' : 'om';
+    applyLanguage(nextLang);
+  });
+}
+
 // Helper: Append Message Bubble to the Chat window
 function appendMessage(sender, text, isError = false) {
+  // Hide starter suggestions once first message is sent
+  if (suggestionsContainer) {
+    suggestionsContainer.style.display = 'none';
+  }
+
   const messageDiv = document.createElement('div');
   messageDiv.className = `message message-${sender} ${isError ? 'message-error' : ''}`;
 
@@ -84,7 +214,7 @@ function appendMessage(sender, text, isError = false) {
   if (sender === 'ai' && !isError) {
     footerContent = `
       <div class="bubble-footer">
-        <button class="btn-speak-msg" title="Speak response">
+        <button class="btn-speak-msg" title="Sagaleen Dubbisi | Speak response">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path class="speaker-wave-icon-path" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -105,6 +235,15 @@ function appendMessage(sender, text, isError = false) {
     </div>
   `;
 
+  if (sender === 'ai' && !isError) {
+    const speakBtn = messageDiv.querySelector('.btn-speak-msg');
+    if (speakBtn) {
+      speakBtn.addEventListener('click', () => {
+        speakMessageText(text, speakBtn);
+      });
+    }
+  }
+
   // Insert before the typing indicator
   messagesContainer.insertBefore(messageDiv, typingIndicator);
   scrollToBottom();
@@ -122,16 +261,12 @@ function hideTypingIndicator() {
 
 // Auto-resize input textarea and manage counts
 messageInput.addEventListener('input', () => {
-  // Auto grow/shrink
   messageInput.style.height = 'auto';
   const newHeight = Math.min(messageInput.scrollHeight, 120);
   messageInput.style.height = `${newHeight}px`;
 
-  // Character counter
   const len = messageInput.value.length;
   charCounter.textContent = `${len} / 1000`;
-
-  // Send button disabled status
   sendBtn.disabled = len === 0;
 });
 
@@ -174,7 +309,8 @@ chatForm.addEventListener('submit', async (e) => {
       },
       body: JSON.stringify({
         message: userMessageText,
-        sessionId: sessionId
+        sessionId: sessionId,
+        language: currentLanguage
       })
     });
 
@@ -188,22 +324,20 @@ chatForm.addEventListener('submit', async (e) => {
         speakMessageText(data.response);
       }
     } else {
-      appendMessage('ai', data.error || 'Server error. Failed to process your message.', true);
+      appendMessage('ai', data.error || (currentLanguage === 'om' ? "Dogoggora sarvaraati. Maaloo irra deebiaa yaalaa." : 'Server error. Failed to process your message.'), true);
     }
   } catch (err) {
     console.error('Fetch error:', err);
     hideTypingIndicator();
-    appendMessage('ai', 'Connection lost. Please check if your server is running and try again.', true);
+    appendMessage('ai', currentLanguage === 'om' ? "Qunnamtiin addaan cite. Maaloo sarvarri keessan hojjachaa jiraachuu mirkaneessaa." : 'Connection lost. Please check if your server is running and try again.', true);
   }
 });
 
 // New Chat Reset Action
 newChatBtn.addEventListener('click', async () => {
-  // Stop recording/speaking if active
   stopRecording();
   stopSpeaking();
 
-  // Confirm with a subtle UI fade or simple confirmation. Since it's a smooth design, let's reset instantly.
   try {
     const response = await fetch('/chat/reset', {
       method: 'POST',
@@ -214,18 +348,20 @@ newChatBtn.addEventListener('click', async () => {
     });
 
     if (response.ok) {
-      // Animate card content transition optionally, or clear messages
       const messages = messagesContainer.querySelectorAll('.message:not(.welcome-message)');
       messages.forEach(msg => {
         msg.style.animation = 'slideUpFade 0.2s reverse forwards';
         setTimeout(() => msg.remove(), 200);
       });
 
-      // Reset Session ID to start fresh
+      // Re-display suggestion chips
+      if (suggestionsContainer) {
+        suggestionsContainer.style.display = 'block';
+      }
+
       sessionId = 'session_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
       sessionStorage.setItem('yeroeai_chat_session_id', sessionId);
       
-      // Focus on message input
       setTimeout(() => {
         messageInput.focus();
       }, 300);
@@ -246,13 +382,14 @@ if (SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = false;
-  recognition.lang = 'en-US';
+  recognition.lang = currentLanguage === 'om' ? 'om-ET' : 'en-US';
 
   recognition.onstart = () => {
     isRecording = true;
     micBtn.classList.add('recording');
-    micBtn.title = "Listening... Click to stop";
-    messageInput.placeholder = "Listening...";
+    const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.om;
+    micBtn.title = t.listeningPlaceholder;
+    messageInput.placeholder = t.listeningPlaceholder;
   };
 
   recognition.onresult = (event) => {
@@ -261,8 +398,6 @@ if (SpeechRecognition) {
       const currentText = messageInput.value;
       const spacing = currentText && !currentText.endsWith(' ') ? ' ' : '';
       messageInput.value = currentText + spacing + transcript;
-      
-      // Trigger character count, auto-resize, and enable send button
       messageInput.dispatchEvent(new Event('input'));
     }
   };
@@ -279,7 +414,6 @@ if (SpeechRecognition) {
     stopRecording();
   };
 } else {
-  // Disable microphone button if browser doesn't support Web Speech API
   micBtn.disabled = true;
   micBtn.title = "Speech recognition is not supported in this browser.";
 }
@@ -287,6 +421,7 @@ if (SpeechRecognition) {
 function startRecording() {
   if (!recognition) return;
   try {
+    recognition.lang = currentLanguage === 'om' ? 'om-ET' : 'en-US';
     recognition.start();
   } catch (error) {
     console.error('Failed to start speech recognition:', error);
@@ -295,12 +430,13 @@ function startRecording() {
 
 function stopRecording() {
   isRecording = false;
+  const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.om;
   if (micBtn) {
     micBtn.classList.remove('recording');
-    micBtn.title = "Voice Input";
+    micBtn.title = t.micTitle;
   }
   if (messageInput) {
-    messageInput.placeholder = "Ask me anything...";
+    messageInput.placeholder = t.inputPlaceholder;
   }
   if (recognition) {
     try {
@@ -315,6 +451,7 @@ micBtn.addEventListener('click', () => {
   if (isRecording) {
     stopRecording();
   } else {
+    stopSpeaking();
     startRecording();
   }
 });
@@ -327,16 +464,16 @@ let currentUtterance = null;
 let speakingElement = null;
 
 function updateVoiceToggleUI() {
+  const t = UI_TRANSLATIONS[currentLanguage] || UI_TRANSLATIONS.om;
   if (isVoiceModeOn) {
     voiceToggleBtn.classList.add('voice-on');
-    document.querySelector('.voice-status-label').textContent = 'Voice ON';
+    if (voiceStatusLabel) voiceStatusLabel.textContent = t.voiceOn;
   } else {
     voiceToggleBtn.classList.remove('voice-on');
-    document.querySelector('.voice-status-label').textContent = 'Voice OFF';
+    if (voiceStatusLabel) voiceStatusLabel.textContent = t.voiceOff;
     stopSpeaking();
   }
 }
-updateVoiceToggleUI();
 
 let voices = [];
 function populateVoiceList() {
@@ -346,10 +483,10 @@ function populateVoiceList() {
   voiceSelect.innerHTML = '';
   
   const sortedVoices = [...voices].sort((a, b) => {
-    const aEn = a.lang.startsWith('en');
-    const bEn = b.lang.startsWith('en');
-    if (aEn && !bEn) return -1;
-    if (!aEn && bEn) return 1;
+    const aMatch = a.lang.startsWith('om') || a.lang.startsWith('en');
+    const bMatch = b.lang.startsWith('om') || b.lang.startsWith('en');
+    if (aMatch && !bMatch) return -1;
+    if (!aMatch && bMatch) return 1;
     return a.name.localeCompare(b.name);
   });
 
@@ -448,11 +585,9 @@ function speakMessageText(text, bubbleSpeakBtn = null) {
   currentUtterance.onstart = () => {
     voiceToggleBtn.classList.add('speaking');
     voiceVisualizer.classList.remove('hidden');
-    
     if (bubbleSpeakBtn) {
       speakingElement = bubbleSpeakBtn;
       speakingElement.classList.add('active-speaking');
-      speakingElement.title = "Stop speaking";
     }
   };
 
@@ -461,7 +596,6 @@ function speakMessageText(text, bubbleSpeakBtn = null) {
     voiceVisualizer.classList.add('hidden');
     if (speakingElement) {
       speakingElement.classList.remove('active-speaking');
-      speakingElement.title = "Speak response";
       speakingElement = null;
     }
     currentUtterance = null;
@@ -481,27 +615,13 @@ function stopSpeaking() {
   voiceVisualizer.classList.add('hidden');
   if (speakingElement) {
     speakingElement.classList.remove('active-speaking');
-    speakingElement.title = "Speak response";
     speakingElement = null;
   }
   currentUtterance = null;
 }
 
-messagesContainer.addEventListener('click', (e) => {
-  const speakBtn = e.target.closest('.btn-speak-msg');
-  if (speakBtn) {
-    if (speakBtn.classList.contains('active-speaking')) {
-      stopSpeaking();
-    } else {
-      const bubble = speakBtn.closest('.message-bubble');
-      const contentDiv = bubble.querySelector('.message-content');
-      speakMessageText(contentDiv.textContent, speakBtn);
-    }
-  }
-});
+// Apply initial language state
+applyLanguage(currentLanguage);
 
-// Initial Scroll focus
-window.addEventListener('load', () => {
-  scrollToBottom();
-  messageInput.focus();
-});
+// Focus input on load
+messageInput.focus();

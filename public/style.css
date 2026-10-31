@@ -290,6 +290,66 @@ body {
   transform: translateY(1px);
 }
 
+/* Language Switcher Button */
+.lang-control-container {
+  display: flex;
+  align-items: center;
+}
+
+.btn-lang-toggle {
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-family-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.btn-lang-toggle svg {
+  width: 15px;
+  height: 15px;
+  color: var(--primary-glow);
+  transition: var(--transition-smooth);
+}
+
+.btn-lang-toggle .lang-name {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.btn-lang-toggle .lang-badge {
+  background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+  color: #070913;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.btn-lang-toggle:hover {
+  background: rgba(0, 242, 254, 0.16);
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.22);
+  transform: translateY(-1px);
+}
+
+.btn-lang-toggle:hover svg {
+  transform: rotate(20deg);
+}
+
+.btn-lang-toggle:active {
+  transform: translateY(1px);
+}
+
+
 /* ==========================================================================
    Messages Display Area
    ========================================================================== */
@@ -431,6 +491,55 @@ body {
   font-family: var(--font-family-title);
   letter-spacing: 0.02em;
 }
+
+/* Quick Starter Suggestions */
+.suggestions-container {
+  margin: 8px 0 16px 48px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.suggestions-title {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.suggestions-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestion-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-size: 0.79rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.suggestion-chip:hover {
+  background: rgba(0, 242, 254, 0.12);
+  border-color: rgba(0, 242, 254, 0.4);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.15);
+}
+
+.suggestion-chip:active {
+  transform: translateY(0);
+}
+
 
 /* ==========================================================================
    Typing Indicator
@@ -995,6 +1104,9 @@ body {
   }
   
   .btn-new-chat span {
+    display: none;
+  }
+  .btn-lang-toggle .lang-name {
     display: none;
   }
   
