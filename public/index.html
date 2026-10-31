@@ -23,7 +23,48 @@
 
   <!-- Main Grid/Container -->
   <main class="app-container">
+    <!-- Glassmorphic Chat Panel -->
     <div class="chat-card" id="chatCard">
+
+      <!-- Card Header -->
+      <header class="chat-header">
+        <div class="header-left">
+          <!-- Animated AI Logo -->
+          <div class="logo-container">
+            <svg class="ai-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" />
+                  <stop offset="100%" stop-color="#4facfe" />
+                </linearGradient>
+                <linearGradient id="logoGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7d5fff" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#ae89ff" stop-opacity="0.3" />
+                </linearGradient>
+              </defs>
+              <!-- Outer Orbiting Ring -->
+              <circle cx="50" cy="50" r="42" stroke="url(#logoGrad2)" stroke-width="2" fill="none"
+                stroke-dasharray="10 5" class="orbiting-ring" />
+              <!-- Middle Core Hexagon -->
+              <polygon points="50,22 74,36 74,64 50,78 26,64 26,36" stroke="url(#logoGrad)" stroke-width="3" fill="none"
+                class="core-hexagon" />
+              <!-- Inner Pulsing Core -->
+              <circle cx="50" cy="50" r="10" fill="url(#logoGrad)" class="pulsing-core" />
+            </svg>
+            <div class="status-badge"></div>
+          </div>
+
+          <div class="header-titles">
+            <h1>YeroeAI</h1>
+            <div class="status-container">
+              <span class="status-dot"></span>
+              <span class="status-text">Ask anything</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+      </header>
     </div>
   </main>
 </body>
